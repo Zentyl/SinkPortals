@@ -6,8 +6,8 @@
 .cell{
     font-size: xx-large;
     font-family: Arial, Helvetica, sans-serif;
-    height: 100px;
-    width: 100px;
+    height: 80px;
+    width: 80px;
     border: solid black;
     text-align: center;
 }
