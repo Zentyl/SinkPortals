@@ -4,10 +4,10 @@
 }
 
 .cell{
-    font-size: xx-large;
+    font-size: xx-large; /*zmien pozniej na 0px */
     font-family: Arial, Helvetica, sans-serif;
-    height: 80px;
-    width: 80px;
+    height: 75px;
+    width: 75px;
     border: solid black;
     text-align: center;
 }
