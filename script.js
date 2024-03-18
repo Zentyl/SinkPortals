@@ -1,56 +1,84 @@
-let grid = document.querySelector(".grid");
-let table = document.createElement("table");
+//Tworzenie planszy gry
+const grid = document.querySelector(".grid");
+const table = document.createElement("table");
 table.className = "center";
 grid.appendChild(table);
 
-let cellCounter = 0;
-let stepsCounter = 0;
+let cellCounter = 0; //Licznik komorek
 
+//Tworzenie komorek
 for (let i = 0; i < 7; i++) {
-    tr = document.createElement("tr");
+    const tr = document.createElement("tr");
     table.appendChild(tr);
     for (let j = 0; j < 7; j++) {
-        td = document.createElement("td");
-        cell = document.createElement("div");
+        const td = document.createElement("td");
+        let cell = document.createElement("div");
         cell.className = "cell";
         cell.setAttribute("index", cellCounter);
         cell.innerHTML = cellCounter;
-        cell.style="background: url(hidden.png)";
+        cell.style = "background: darkgray";
         td.appendChild(cell);
         table.appendChild(td);
         cellCounter++;
     }
 }
 
+//Liczniki niezatopionych komorek poszczegolnych portali
+let horizontalCounter = 4;
+let verticalCounter = 4;
+let squareCounter = 4;
 
-clickCell = (cell) => {
-    if(cell.target.getAttribute("portal") == "horizontal"){
-        cell.target.style="background: url(1.png)";
+let portalCounter = 12; //Licznik niezatopionych komorek wszystkich portali
+
+let stepsCounter = 0; //Licznik krokow gracza
+
+//Akcje wykonywane po kliknieciu gracza w tabele
+function clickCell(cell) {
+    if (cell.target.getAttribute("portal") == "horizontal") {
+        cell.target.style = "background: url(1.png)";
+        portalCounter--;
+        horizontalCounter--;
+        if (horizontalCounter == 0)
+            document.getElementById("action").innerHTML = "TRAFIONY ZATOPIONY FACEBOOK";
+        else
+            document.getElementById("action").innerHTML = "TRAFIONY";
     }
-    else if(cell.target.getAttribute("portal") == "vertical"){
-        cell.target.style="background: url(2.png)";
+    else if (cell.target.getAttribute("portal") == "vertical") {
+        cell.target.style = "background: url(2.png)";
+        portalCounter--;
+        verticalCounter--;
+        if (verticalCounter == 0)
+            document.getElementById("action").innerHTML = "TRAFIONY ZATOPIONY YOUTUBE";
+        else
+            document.getElementById("action").innerHTML = "TRAFIONY";
     }
-    else if(cell.target.getAttribute("portal") == "square"){
-        cell.target.style="background: url(3.png)";
+    else if (cell.target.getAttribute("portal") == "square") {
+        cell.target.style = "background: url(3.png)";
+        portalCounter--;
+        squareCounter--;
+        if (squareCounter == 0)
+            document.getElementById("action").innerHTML = "TRAFIONY ZATOPIONY TIKTOK";
+        else
+            document.getElementById("action").innerHTML = "TRAFIONY";
     }
-    else
-        cell.target.style="background: url(wrong.png)";
-    cell.target.innerHTML=".";
+    else {
+        cell.target.style = "background: url(wrong.png)";
+        document.getElementById("action").innerHTML = "PUDŁO";
+    }
+    cell.target.innerHTML = ".";
     stepsCounter++;
     cell.target.removeEventListener("click", clickCell);
-    checkWinner();
-    console.log(stepsCounter);
-    document.getElementById("steps").innerHTML = "Wykonane kroki: " + stepsCounter;
+    document.getElementById("steps").innerHTML = "WYKONANE RUCHY: " + stepsCounter;
+    checkEnd();
 }
 
-
+//Nadanie komorkom mozliwosci bycia kliknietymi
 document.querySelectorAll(".cell").forEach(
     cell => cell.addEventListener("click", clickCell)
 );
 
-var cellsOccupied = [];
-var leftPortals = 3;
-var leftImages = 3;
+//Sprawdzanie czy w poszczegolnych komorkach nie istnieje juz inny portal
+let cellsOccupied = [];
 function checkCells(portal) {
     for (let i = 0; i < 5; i++) {
         if (cellsOccupied.includes(portal[i]))
@@ -58,9 +86,9 @@ function checkCells(portal) {
     }
 }
 
-
+//Tworzenie portali
 function createHorizontalPortal(portal) {
-    //Komórki niedostępne dla wylosowanej pozycji ostatniej komórki portalu poziomego
+    //Komórki niedostepne dla wylosowanej ostatniej komorki portalu poziomego
     let cellsForbidden = [];
     for (let i = 0; i < 49; i += 7)
         cellsForbidden.push(i);
@@ -70,12 +98,12 @@ function createHorizontalPortal(portal) {
         cellsForbidden.push(i);
     let end = 0;
     do {
-        //Losowanie pozycji ostatniej komórki portalu poziomego
+        //Losowanie ostatniej komorki portalu poziomego
         do {
             end = Math.floor(Math.random() * 49);
         } while (cellsForbidden.includes(end));
 
-        //Utworzenie portalu poziomego
+        //Tworzenie portalu poziomego
         portal.push(end - 3, end - 2, end - 1, end);
     } while (checkCells(portal));
     cellsOccupied.push(...portal);
@@ -84,7 +112,7 @@ function createHorizontalPortal(portal) {
 }
 
 function createVerticalPortal(portal) {
-    //Komórki niedostępne dla wylosowanej pozycji ostatniej komórki portalu pionowego
+    //Komórki niedostepne dla wylosowanej ostatniej komorki portalu pionowego
     let cellsForbidden = [];
     for (let i = 0; i < 21; i++)
         cellsForbidden.push(i);
@@ -95,7 +123,7 @@ function createVerticalPortal(portal) {
         do {
             end = Math.floor(Math.random() * 49);
         } while (cellsForbidden.includes(end));
-        //Utworzenie portalu pionowego
+        //Tworzenie portalu pionowego
         portal.push(end - 21, end - 14, end - 7, end);
     } while (checkCells(portal));
     cellsOccupied.push(...portal);
@@ -104,7 +132,7 @@ function createVerticalPortal(portal) {
 }
 
 function createSquarePortal(portal) {
-    //Komórki niedostępne dla wylosowanej pozycji ostatniej komórki portalu kwadratowego
+    //Komórki niedostepne dla wylosowanej ostatniej komorki portalu kwadratowego
     let cellsForbidden = [];
     for (let i = 0; i < 49; i += 7)
         cellsForbidden.push(i);
@@ -118,7 +146,7 @@ function createSquarePortal(portal) {
         do {
             end = Math.floor(Math.random() * 49);
         } while (cellsForbidden.includes(end));
-        //Utworzenie portalu kwadratowego
+        //Tworzenie portalu kwadratowego
         portal.push(end - 8, end - 7, end - 1, end);
     } while (checkCells(portal));
     cellsOccupied.push(...portal);
@@ -126,57 +154,61 @@ function createSquarePortal(portal) {
         document.querySelector(`.cell[index='${portal[i]}']`).setAttribute("portal", "square");
 }
 
-let horPortal = [];
-createHorizontalPortal(horPortal);
-let verPortal = [];
-createVerticalPortal(verPortal);
-let sqPortal = [];
-createSquarePortal(sqPortal);
+//Utworzenie portali
+const horizontalPortal = [];
+createHorizontalPortal(horizontalPortal);
+const verticalPortal = [];
+createVerticalPortal(verticalPortal);
+const squarePortal = [];
+createSquarePortal(squarePortal);
 
-const portals = [horPortal, verPortal, sqPortal];
+const portals = [horizontalPortal, verticalPortal, squarePortal]; //Tabela zawierajaca portale
 
-console.log(horPortal);
-console.log(verPortal);
-console.log(sqPortal);
-
-getCellValue = (i) => {
+//Funkcja zwracajaca indeks komorki portalu
+function getCellValue(i) {
     return document.querySelector(`.cell[index='${i}']`).innerHTML;
 }
 
-checkHorizontal = () => {
-    let a = getCellValue(portals[0][0]);
-    let b = getCellValue(portals[0][1]);
-    let c = getCellValue(portals[0][2]);
-    let d = getCellValue(portals[0][3]);
+//Sprawdzanie czy portal poziomy zostal zatopiony
+function checkHorizontal() {
+    const a = getCellValue(portals[0][0]);
+    const b = getCellValue(portals[0][1]);
+    const c = getCellValue(portals[0][2]);
+    const d = getCellValue(portals[0][3]);
     if (a == b && b == c && c == d) {
         return true;
     }
 }
 
-checkVertical = () => {
-    let a = getCellValue(portals[1][0]);
-    let b = getCellValue(portals[1][1]);
-    let c = getCellValue(portals[1][2]);
-    let d = getCellValue(portals[1][3]);
+//Sprawdzanie czy portal pionowy zostal zatopiony
+function checkVertical() {
+    const a = getCellValue(portals[1][0]);
+    const b = getCellValue(portals[1][1]);
+    const c = getCellValue(portals[1][2]);
+    const d = getCellValue(portals[1][3]);
     if (a == b && b == c && c == d) {
         return true;
     }
 }
 
-checkSquare = () => {
-    let a = getCellValue(portals[2][0]);
-    let b = getCellValue(portals[2][1]);
-    let c = getCellValue(portals[2][2]);
-    let d = getCellValue(portals[2][3]);
+//Sprawdzanie czy portal kwadratowy zostal zatopiony
+function checkSquare() {
+    const a = getCellValue(portals[2][0]);
+    const b = getCellValue(portals[2][1]);
+    const c = getCellValue(portals[2][2]);
+    const d = getCellValue(portals[2][3]);
     if (a == b && b == c && c == d) {
         return true;
     }
 }
 
-checkWinner = () => {
-    if (checkHorizontal() && checkVertical() && checkSquare())
-        console.log("Wygrałeś");
+//Sprawdzanie czy wszystkie portale zostaly zatopione
+function checkEnd() {
+    if (checkHorizontal() && checkVertical() && checkSquare()) {
+        document.getElementById("action").innerHTML = "KONIEC GRY";
+        document.getElementById("steps").innerHTML = "UDAŁO CI SIĘ W " + stepsCounter + " RUCHACH";
+        document.querySelectorAll(".cell").forEach(
+            cell => cell.removeEventListener("click", clickCell)
+        ); //Usuniecie mozliwosci klikania przez gracza w komorki
+    }
 }
-
-
-
